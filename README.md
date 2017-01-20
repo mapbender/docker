@@ -5,10 +5,10 @@ To get started:
 
 Do once:
 
-`git clone git@github.com:mapbender/docker.git mapbender`
-`cd mapbender`
-`docker-compose build`
+* `git clone git@github.com:mapbender/docker.git mapbender`
+* `cd mapbender`
+* `docker-compose build`
 
 To start:
 
-`docker-compose up`
+* `docker-compose up`
