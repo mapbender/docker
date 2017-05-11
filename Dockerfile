@@ -3,7 +3,7 @@ FROM nginx
 RUN apt-get update -y
 RUN apt-get upgrade -y --force-yes
 
-RUN apt-get install curl wget git php5 php5-mcrypt php5-mysql php5-curl php5-gd php5-intl php5-mcrypt php5-memcache php5-sqlite php5-pgsql php5-fpm gdal-bin net-tools npm python gdal-bin python-pip zip -y
+RUN apt-get install curl wget git php5 php5-bz2 php5-mcrypt php5-mysql php5-curl php5-gd php5-intl php5-mcrypt php5-memcache php5-sqlite php5-pgsql php5-fpm gdal-bin net-tools npm python gdal-bin python-pip zip -y
 
 RUN mkdir mapbender
 RUN git clone -b release/3.0.5 https://github.com/mapbender/mapbender-starter.git mapbender
