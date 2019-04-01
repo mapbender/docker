@@ -12,3 +12,4 @@ Do once:
 To start:
 
 * `docker-compose up`
+* `call http://localhost:9000 or http://localhost:9000/app.php in your browser`
