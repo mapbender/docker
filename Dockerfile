@@ -1,30 +1,29 @@
-FROM nginx
+FROM debian:9
 
 RUN apt-get update -y
 RUN apt-get upgrade -y --force-yes
+RUN apt-get install apt-transport-https lsb-release ca-certificates wget -y
+RUN wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+RUN sh -c 'echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
+RUN apt-get update -y
+RUN apt-get install apache2 curl git openssl vim -y --allow-unauthenticated
+RUN apt-get install php7.2 php7.2-common php7.2-gd php7.2-curl php7.2-cli php7.2-xml -y --allow-unauthenticated
+RUN apt-get install sqlite3 php7.2-sqlite3 php7.2-intl openssl php7.2-zip php7.2-mbstring php7.2-bz2 -y --allow-unauthenticated
+RUN apt-get install php7.2-fpm php7.2-pgsql php7.2-mysql -y --allow-unauthenticated
 
-RUN apt-get install curl wget git php5 php5-bz2 php5-mcrypt php5-mysql php5-curl php5-gd php5-intl php5-mcrypt php5-memcache php5-sqlite php5-pgsql php5-fpm gdal-bin net-tools npm python gdal-bin python-pip zip -y
+RUN git clone https://github.com/mapbender/mapbender-starter.git /var/www/mapbender
+RUN cd /var/www/mapbender; ./bootstrap
 
-RUN mkdir mapbender
-RUN git clone -b release/3.0.5 https://github.com/mapbender/mapbender-starter.git mapbender
-RUN cd mapbender; git submodule update --init --recursive
-RUN cp mapbender/application/app/config/parameters.yml.dist mapbender/application/app/config/parameters.yml
-RUN curl -sS https://getcomposer.org/installer | php
-RUN ./composer.phar install -d mapbender/application/
-RUN mapbender/application/app/console doctrine:database:create
-RUN mapbender/application/app/console doctrine:schema:create
-RUN mapbender/application/app/console assets:install mapbender/application/web/
-RUN mapbender/application/app/console fom:user:resetroot --username=root --password=root --email=root@root.de -n
-RUN mapbender/application/app/console doctrine:fixtures:load --fixtures=mapbender/application/mapbender/src/Mapbender/CoreBundle/DataFixtures/ORM/Epsg/ --append
-RUN rm -rf mapbender/application/app/cache/* mapbender/application/app/logs/*
-RUN chown www-data.www-data mapbender/application/app/cache mapbender/application/app/logs
+RUN chown -R www-data:www-data /var/www/mapbender
+RUN chmod -R ugo+r /var/www/mapbender
+RUN chmod -R ug+w /var/www/mapbender/application/web/uploads
+RUN chmod ug+w /var/www/mapbender/application/app/db/demo.sqlite
+RUN chmod ug+x /var/www/mapbender/application/vendor/eslider/sasscb/dist/sassc
 
-RUN sed -e 's/;daemonize = yes/daemonize = no/' -i /etc/php5/fpm/php-fpm.conf
-RUN sed -e 's/;listen\.owner/listen.owner/' -i /etc/php5/fpm/pool.d/www.conf
-RUN sed -e 's/;listen\.group/listen.group/' -i /etc/php5/fpm/pool.d/www.conf
-RUN sed -e 's/listen = .var.run.php5-fpm.sock/listen = 127.0.0.1:9000/' -i /etc/php5/fpm/pool.d/www.conf
-RUN sed -e 's/;catch_workers_output/catch_workers_output/' -i /etc/php5/fpm/pool.d/www.conf
+RUN a2enmod rewrite
+RUN rm /etc/apache2/sites-enabled/*
+RUN echo 'ServerName localhost' >> /etc/apache2/apache2.conf
 
-COPY default.conf /etc/nginx/conf.d/default.conf
+COPY ./default.conf /etc/apache2/sites-enabled/mapbender.conf
 
-CMD /etc/init.d/php5-fpm restart; nginx -g 'daemon off;'
+CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
