@@ -2,3 +2,5 @@ version: '2'
 services:
     mapbender:
         build: .
+        ports:
+            - "9000:80"
