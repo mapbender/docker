@@ -21,8 +21,8 @@ RUN chmod ug+w /var/www/mapbender/application/app/db/demo.sqlite
 RUN chmod ug+x /var/www/mapbender/application/vendor/eslider/sasscb/dist/sassc
 
 RUN a2enmod rewrite
-RUN rm /etc/apache2/sites-enabled/*
 RUN echo 'ServerName localhost' >> /etc/apache2/apache2.conf
+RUN rm /etc/apache2/sites-enabled/*
 
 COPY ./default.conf /etc/apache2/sites-enabled/mapbender.conf
 
