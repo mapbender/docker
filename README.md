@@ -1,5 +1,5 @@
 This Dockerfile clones the mapbender-starter git repository and builds
-an nginx container with mapbender up and running.
+a debian 9 container with mapbender up and running.
 
 To get started:
 
